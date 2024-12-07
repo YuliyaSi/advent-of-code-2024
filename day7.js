@@ -28,13 +28,12 @@ const countTrueEquations = (twodarray) => {
         return generateCombinations(combLength)
     }
     const isTrueCombination = (numbers, operators, result) => {
-        let numRes = 0;
+        let numRes = numbers[0];
 
-        numbers.forEach((num, inx, arr) => {
-            if (inx === 0) return;
-            if (inx > 1) {
+        numbers.forEach((num, inx) => {
+            if (inx >= 1) {
                 numRes = eval(`${numRes}${operators[inx-1]}${num}`)
-            } else numRes = eval(`${arr[0]}${operators[inx-1]}${num}`)
+            }
         })
 
         return numRes === result;
@@ -58,3 +57,52 @@ const countTrueEquations = (twodarray) => {
 
 console.log(countTrueEquations(testArray))
 console.log(countTrueEquations(dataArray))
+
+const countTrueConcatenatedEquations = (twodarray) => {
+    let countedTruly = 0;
+
+    const combinations = (numArray) => {
+        const combLength = numArray.length-1;
+        const generateCombinations = (length, prefix = '', result = []) => {
+            if (length === 0) {
+                result.push(prefix);
+                return result;
+            }
+            generateCombinations(length - 1, prefix + '+', result);
+            generateCombinations(length - 1, prefix + '*', result);
+            generateCombinations(length - 1, prefix + '|', result);
+            return result;
+        }
+
+        return generateCombinations(combLength)
+    }
+    const isTrueCombination = (numbers, operators, result) => {
+        let numRes = numbers[0];
+        numbers.forEach((num, inx) => {
+            if (inx >= 1) {
+                const operator = operators[inx-1];
+                numRes = operator === '|' ? `${numRes}${num}` : eval(`${numRes}${operator}${num}`)
+            }
+        })
+
+        return +numRes === result;
+    }
+
+    for (let i = 0; i < twodarray.length; i++) {
+        const numResult = twodarray[i][0];
+        const numArray = twodarray[i][1];
+        const combinationsArray = combinations(numArray);
+
+        for (let j = 0; j < combinationsArray.length; j++) {
+            if (isTrueCombination(numArray, combinationsArray[j], numResult)) {
+                countedTruly += numResult;
+                break;
+            }
+        }
+    }
+
+    return countedTruly;
+}
+
+console.log(countTrueConcatenatedEquations(testArray));
+console.log(countTrueConcatenatedEquations(dataArray));
