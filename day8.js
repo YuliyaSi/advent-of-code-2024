@@ -5,8 +5,6 @@ const convertToArray = (stringMap) => stringMap.split('\n').map(str => str.split
 const testrarray = convertToArray(testMap);
 const taskarray = convertToArray(taskMap);
 
-console.log(taskarray[9])
-
 const findAllIndexes = (arr, elem) => arr.reduce(function(a, e, i) {
     if (e === elem)
         a.push(i);
@@ -55,5 +53,7 @@ const countUniqueLocations = (d2array) => {
   return uniqSet.size
 }
 
-console.log(countUniqueLocations(testrarray))
-console.log(countUniqueLocations(taskarray))
+// console.log(countUniqueLocations(testrarray))
+// console.log(countUniqueLocations(taskarray))
+
+
