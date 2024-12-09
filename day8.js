@@ -56,4 +56,64 @@ const countUniqueLocations = (d2array) => {
 // console.log(countUniqueLocations(testrarray))
 // console.log(countUniqueLocations(taskarray))
 
+const newTestString = 'T.........\n' + '...T......\n' + '.T........\n' + '..........\n' + '..........\n' + '..........\n' + '..........\n' + '..........\n' + '..........\n' + '..........'
+const newTestArray = convertToArray(newTestString);
+
+const countUniqueGridLocations = (d2array) => {
+    const uniqSet = new Set();
+    const uniqSymbolsSet = new Set(d2array.flat());
+    uniqSymbolsSet.delete('.');
+    const uniqKeys = uniqSymbolsSet.keys();
+
+    const iterations = uniqSymbolsSet.size;
+
+    const buildPoints = (points, pointsArray) => {
+        const [x, y] = points;
+        uniqSet.add(`${x},${y}`)
+        pointsArray.forEach(([x1, y1]) => {
+            const diffX = x - x1;
+            const diffY = y - y1;
+
+            let tempX = x;
+            let tempY = y;
+
+            while (true) {
+                tempX += diffX;
+                tempY += diffY;
+                if (
+                    tempX < d2array.length &&
+                    tempY < d2array[0].length &&
+                    tempX >= 0 &&
+                    tempY >= 0
+                ) {
+                    uniqSet.add(`${tempX},${tempY}`);
+                } else {
+                    break;
+                }
+            }
+
+        })
+    }
+
+    for (let i = 0; i < iterations; i++) {
+        const searchingKey = uniqKeys.next().value;
+        const searchingArr = [];
+        for (let j = 0; j < d2array.length; j++) {
+            const inds = findAllIndexes(d2array[j], searchingKey);
+            inds.forEach(ind => searchingArr.push([j, ind]));
+        }
+
+        for (let k = 0; k < searchingArr.length; k++) {
+            const kpoints = searchingArr[k];
+            const kpointsArray = searchingArr.filter((el, inx) => inx !== k);
+            buildPoints(kpoints, kpointsArray);
+        }
+    }
+
+    return uniqSet.size
+}
+
+console.log(countUniqueGridLocations(newTestArray))
+console.log(countUniqueGridLocations(testrarray))
+console.log(countUniqueGridLocations(taskarray))
 
