@@ -17,8 +17,25 @@ const convertToData = str => str
         return [{a: ax, b: bx, cx}, {a: ay, b: by, cy}]
     })
 
+const convertToDataForSecond = str => str
+    .split('\n\n')
+    .map(innStr => {
+        const arr = innStr.split('\n');
+        const ax = parseInt(arr[0].slice(12, 14));
+        const ay = parseInt(arr[0].slice(18, 20));
+
+        const bx = parseInt(arr[1].slice(12, 14))
+        const by = parseInt(arr[1].slice(18, 20));
+
+        const cx = parseInt(arr[2].slice(9, arr[2].indexOf(','))) + 10000000000000;
+        const cy = parseInt(arr[2].slice(arr[2].indexOf('Y=') + 2, arr[2].length)) + 10000000000000;
+
+        return [{a: ax, b: bx, cx}, {a: ay, b: by, cy}]
+    })
+
 const testdata = convertToData(teststring);
 const taskdata = convertToData(taskstring);
+const newtaskdata = convertToDataForSecond(taskstring);
 
 const countTokens = ( dataMap ) => {
     const da = 3;
@@ -80,5 +97,67 @@ const countTokens = ( dataMap ) => {
     return resultObj.a * da + resultObj.b * db
 }
 
-console.log(countTokens(testdata));
-console.log(countTokens(taskdata));
+const countBigTokens = ( dataMap ) => {
+    const da = 3;
+    const db = 1;
+
+    const resultObj = {
+        a: 0, b: 0
+    }
+
+    const solveEquations = ( a1, b1, c1, a2, b2, c2 ) => {
+        /*
+
+        a1*i + b1*j = c1
+        a2*i + b2*j = c2
+
+        j = (c1 - a1*i)/b1
+        a2*i + b2*j = c2
+
+        a2*i + b2/b1*(c1 - a1*i) = c2
+
+        const numerator = c2 - (b2 / b1) * c1;
+        const denominator = a2 - (b2 / b1) * a1;
+
+        * */
+
+        const numeratorI = c2 - (b2 / b1) * c1;
+        const denominatorI = a2 - (b2 / b1) * a1;
+
+        const i = Math.round(numeratorI/denominatorI)
+        const j = Math.round((c1 - a1*i)/b1)
+
+        return {i, j};
+    }
+
+    const testSolvation = ( a1, b1, c1, a2, b2, c2, i, j ) =>
+        a1 * i + b1 * j === c1 && a2 * i + b2 * j === c2;
+
+    for (let k = 0; k < dataMap.length; k++) {
+        const buttonA = dataMap[k][0];
+        const buttonB = dataMap[k][1];
+
+        const {i, j} = solveEquations(
+            buttonA.a, buttonA.b, buttonA.cx,
+            buttonB.a, buttonB.b, buttonB.cy,
+        )
+
+        const solvResult = testSolvation(
+            buttonA.a, buttonA.b, buttonA.cx,
+            buttonB.a, buttonB.b, buttonB.cy,
+            i, j
+        )
+
+        if (solvResult) {
+            resultObj.a += i;
+            resultObj.b += j;
+        }
+    }
+
+    return resultObj.a * da + resultObj.b * db
+}
+
+// console.log(countTokens(testdata));
+// console.log(countTokens(taskdata));
+
+console.log(countBigTokens(newtaskdata));
